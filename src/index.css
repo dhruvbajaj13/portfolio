@@ -1,0 +1,287 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===============================
+   DARK BLUE × BLACK PROFESSIONAL THEME
+   =============================== */
+
+@layer base {
+  :root {
+    /* Ultra-dark navy-black base */
+    --background: 220 50% 3%;
+    --foreground: 210 18% 88%;
+
+    /* Elevated surfaces */
+    --card: 220 45% 7%;
+    --card-foreground: 210 18% 88%;
+
+    --popover: 220 40% 6%;
+    --popover-foreground: 210 18% 88%;
+
+    /* Muted professional blue */
+    --primary: 213 60% 48%;
+    --primary-foreground: 220 50% 3%;
+
+    --secondary: 220 35% 10%;
+    --secondary-foreground: 210 15% 80%;
+
+    --muted: 220 25% 14%;
+    --muted-foreground: 210 12% 55%;
+
+    --accent: 213 60% 48%;
+    --accent-foreground: 220 50% 3%;
+
+    --destructive: 0 60% 48%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 25% 14%;
+    --input: 220 35% 9%;
+    --ring: 213 60% 48%;
+
+    --radius: 0.6rem;
+
+    /* Interaction tokens */
+    --glow-primary: 0 0 30px hsl(213 60% 48% / 0.18);
+    --shadow-card: 0 10px 40px hsl(220 50% 2% / 0.8);
+    --glass-bg: hsl(220 45% 7% / 0.85);
+    --glass-border: hsl(220 30% 18% / 0.5);
+  }
+
+  /* ---------------- GLOBAL SAFETY FIXES ---------------- */
+
+  *,
+  *::before,
+  *::after {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* ✅ CRITICAL: prevent scroll lock */
+  html,
+  body {
+    height: auto;
+    min-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  /* ✅ CRITICAL: React root must be scrollable */
+  #root {
+    min-height: 100vh;
+    overflow-x: hidden;
+    overflow-y: visible;
+  }
+
+  /* ✅ Fix fixed-navbar offset once */
+  section {
+    scroll-margin-top: 120px;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Syne', system-ui, sans-serif;
+  }
+
+  /* Subtle background depth */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(
+        800px 400px at 20% -10%,
+        hsl(213 60% 48% / 0.06),
+        transparent 40%
+      ),
+      radial-gradient(
+        600px 300px at 90% 20%,
+        hsl(213 60% 48% / 0.04),
+        transparent 45%
+      );
+    pointer-events: none;
+    z-index: -1;
+  }
+}
+
+/* ===============================
+   COMPONENTS
+   =============================== */
+
+@layer components {
+  /* Glass Card */
+  .glass-card {
+    @apply relative overflow-hidden rounded-lg transition-all duration-300;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+  }
+
+  .glass-card:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow:
+      var(--shadow-card),
+      0 0 0 1px hsl(var(--primary) / 0.25);
+  }
+
+  /* Text Gradient */
+  .text-gradient {
+    background: linear-gradient(
+      135deg,
+      hsl(213 60% 55%) 0%,
+      hsl(213 50% 65%) 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Buttons */
+  .btn-primary {
+    @apply relative px-5 py-2.5 rounded-md font-medium text-sm
+      text-primary-foreground transition-all duration-200;
+    background: hsl(var(--primary));
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: var(--glow-primary);
+  }
+
+  .btn-primary:active {
+    transform: scale(0.97);
+  }
+
+  .btn-secondary {
+    @apply px-5 py-2.5 rounded-md font-medium text-sm
+      border border-border bg-secondary/60
+      text-foreground transition-all duration-200;
+  }
+
+  .btn-secondary:hover {
+    background: hsl(var(--primary) / 0.12);
+    box-shadow: 0 0 0 1px hsl(var(--primary) / 0.25);
+    transform: translateY(-1px) scale(1.03);
+  }
+
+  .btn-secondary:active {
+    transform: scale(0.97);
+  }
+
+  /* Navigation Link */
+  .nav-link {
+    @apply relative text-muted-foreground
+      hover:text-foreground transition-colors duration-200;
+  }
+
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      hsl(var(--primary)),
+      transparent
+    );
+    transform: translateX(-50%);
+    transition: width 0.25s ease;
+  }
+
+  .nav-link:hover::after,
+  .nav-link.active::after {
+    width: 110%;
+  }
+
+  .nav-link.active {
+    @apply text-foreground;
+  }
+
+  /* Timeline */
+  .timeline-line {
+    @apply absolute left-6 top-0 bottom-0 w-px bg-border;
+  }
+
+  .timeline-dot {
+    @apply w-2.5 h-2.5 rounded-full bg-primary;
+  }
+
+  /* Contact Input */
+  .contact-input {
+    @apply w-full px-4 py-2.5 rounded-md
+      bg-secondary/50 border border-border
+      text-foreground placeholder:text-muted-foreground
+      focus:outline-none focus:border-primary/40
+      focus:ring-1 focus:ring-primary/15
+      transition-all duration-200;
+  }
+
+  /* Social Icon */
+  .social-icon {
+    @apply p-2.5 rounded-md
+      bg-secondary/50 border border-border
+      text-muted-foreground
+      hover:border-primary/30
+      hover:text-primary
+      hover:bg-primary/5
+      transition-all duration-200;
+  }
+}
+
+/* ===============================
+   UTILITIES
+   =============================== */
+
+@layer utilities {
+  .animate-scroll-mouse {
+    animation: scroll-mouse 2s ease-in-out infinite;
+  }
+
+  @keyframes scroll-mouse {
+    0%, 100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    50% {
+      transform: translateY(5px);
+      opacity: 0.5;
+    }
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  ::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--background));
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted));
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary) / 0.4);
+  }
+}
