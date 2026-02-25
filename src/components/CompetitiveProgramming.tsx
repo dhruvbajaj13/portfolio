@@ -53,7 +53,7 @@ const platforms = [
       { label: 'Problems Solved', value: 700, suffix: '+' },
       { label: 'Contests', value: 30, suffix: '+' },
       { label: 'Rating', value: 1861 },
-      { label: 'Global Rank', value: 45,075, suffix: '+' },
+      { label: 'Global Rank', value: 45075, suffix: '+' },
     ],
     topics: ['Arrays', 'DP', 'Trees', 'Graphs', 'Binary Search'],
   },
