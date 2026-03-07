@@ -52,8 +52,8 @@ const platforms = [
     stats: [
       { label: 'Problems Solved', value: 700, suffix: '+' },
       { label: 'Contests', value: 30, suffix: '+' },
-      { label: 'Rating', value: 1861 },
-      { label: 'Global Rank', value: 45075, suffix: '+' },
+      { label: 'Rating', value: 1879 },
+      { label: 'Global Rank', value: 42026, suffix: '+' },
     ],
     topics: ['Arrays', 'DP', 'Trees', 'Graphs', 'Binary Search'],
   },
@@ -76,7 +76,7 @@ const platforms = [
     iconSize: 'w-16 h-16',
     link: 'https://www.codechef.com/users/dhruvvv_1307',
     stats: [
-      { label: 'Rating', value: 1446 },
+      { label: 'Rating', value: 1459 },
       { label: 'Stars', value: 2 },
       { label: 'Contests', value: 7, suffix: '+' },
       { label: 'Problems Solved', value: 50, suffix: '+' },
