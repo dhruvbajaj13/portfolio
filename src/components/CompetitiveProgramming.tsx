@@ -48,7 +48,7 @@ const platforms = [
     name: 'LeetCode',
     icon: 'https://upload.wikimedia.org/wikipedia/commons/1/19/LeetCode_logo_black.png',
     iconSize: 'w-12 h-12',
-    link: 'https://leetcode.com/u/gitcommitDD/',
+    link: 'https://leetcode.com/u/Dhruv-Bajaj13/',
     stats: [
       { label: 'Problems Solved', value: 700, suffix: '+' },
       { label: 'Contests', value: 30, suffix: '+' },
