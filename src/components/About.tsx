@@ -94,7 +94,7 @@ const About = () => {
       <img
         src={profilePhoto}
         alt="Dhruv Bajaj"
-        className="w-full h-full object-cover scale-125"
+        className="w-full h-full object-cover object-top"
       />
     </div>
 
