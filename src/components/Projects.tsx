@@ -1,244 +1,291 @@
 import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ExternalLink, Github, ArrowRight, X } from 'lucide-react';
+import { ExternalLink, Github, X, ArrowUpRight, Zap, Globe, Code2, Chrome } from 'lucide-react';
 import { projects, Project } from '@/data/projects';
 
 gsap.registerPlugin(ScrollTrigger);
 
-/* ================= PROJECT CARD ================= */
+/* ─── helpers ─── */
+const categoryMeta: Record<string, { label: string; Icon: React.ElementType; color: string }> = {
+  splitr:       { label: 'Full-Stack · AI',        Icon: Zap,      color: 'from-violet-500/20 to-purple-500/10 border-violet-500/30' },
+  'smart-agent':{ label: 'AI · LLM',               Icon: Globe,    color: 'from-cyan-500/20 to-teal-500/10 border-cyan-500/30'       },
+  codecraft:    { label: 'SaaS · Full-Stack',       Icon: Code2,    color: 'from-orange-500/20 to-amber-500/10 border-orange-500/30'  },
+  synthex:      { label: 'Chrome Extension · AI',  Icon: Chrome,   color: 'from-emerald-500/20 to-green-500/10 border-emerald-500/30' },
+};
 
-const ProjectCard = ({
-  project,
-  onClick,
-}: {
-  project: Project;
-  onClick: () => void;
-}) => {
-  const isChromeExtension = project.title === 'Synthex';
+const accentMap: Record<string, string> = {
+  splitr:        'group-hover:text-violet-400',
+  'smart-agent': 'group-hover:text-cyan-400',
+  codecraft:     'group-hover:text-orange-400',
+  synthex:       'group-hover:text-emerald-400',
+};
+
+const glowMap: Record<string, string> = {
+  splitr:        'hover:shadow-violet-500/10',
+  'smart-agent': 'hover:shadow-cyan-500/10',
+  codecraft:     'hover:shadow-orange-500/10',
+  synthex:       'hover:shadow-emerald-500/10',
+};
+
+const chipAccentMap: Record<string, string> = {
+  splitr:        'group-hover:border-violet-500/40 group-hover:text-violet-300',
+  'smart-agent': 'group-hover:border-cyan-500/40 group-hover:text-cyan-300',
+  codecraft:     'group-hover:border-orange-500/40 group-hover:text-orange-300',
+  synthex:       'group-hover:border-emerald-500/40 group-hover:text-emerald-300',
+};
+
+const tagGradient: Record<string, string> = {
+  splitr:        'bg-violet-500/15 text-violet-300 border-violet-500/30',
+  'smart-agent': 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30',
+  codecraft:     'bg-orange-500/15 text-orange-300 border-orange-500/30',
+  synthex:       'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
+};
+
+const modalAccent: Record<string, { badge: string; border: string; heading: string; glow: string }> = {
+  splitr:        { badge: 'bg-violet-500/15 text-violet-300',  border: 'border-violet-500/30', heading: 'text-violet-400',  glow: 'shadow-violet-500/20'  },
+  'smart-agent': { badge: 'bg-cyan-500/15 text-cyan-300',      border: 'border-cyan-500/30',   heading: 'text-cyan-400',    glow: 'shadow-cyan-500/20'    },
+  codecraft:     { badge: 'bg-orange-500/15 text-orange-300',  border: 'border-orange-500/30', heading: 'text-orange-400',  glow: 'shadow-orange-500/20'  },
+  synthex:       { badge: 'bg-emerald-500/15 text-emerald-300',border: 'border-emerald-500/30',heading: 'text-emerald-400', glow: 'shadow-emerald-500/20' },
+};
+
+const featureIcons = ['✦', '⬡', '◈', '⟁', '◉'];
+
+/* ─── card ─── */
+const ProjectCard = ({ project, index, onClick }: { project: Project; index: number; onClick: () => void }) => {
+  const meta  = categoryMeta[project.id]  ?? { label: 'Project', Icon: Code2, color: 'from-primary/20 to-primary/5 border-primary/20' };
+  const hoverAccent = accentMap[project.id]   ?? 'group-hover:text-primary';
+  const hoverGlow   = glowMap[project.id]     ?? 'hover:shadow-primary/10';
+  const chipAccent  = chipAccentMap[project.id] ?? '';
+  const tag         = tagGradient[project.id] ?? 'bg-primary/15 text-primary border-primary/30';
+
+  const isFeatured = index === 0;
 
   return (
     <div
       onClick={onClick}
-      className="
-        project-card glass-card group cursor-pointer overflow-hidden
-        transition-all duration-300
-        hover:-translate-y-1.5 hover:shadow-xl hover:shadow-primary/10
-      "
+      className={`
+        project-card group relative cursor-pointer overflow-hidden rounded-2xl
+        border border-border/40 bg-card/60 backdrop-blur-sm
+        transition-all duration-500
+        hover:-translate-y-2 hover:border-border/80 hover:shadow-2xl ${hoverGlow}
+        ${isFeatured ? 'md:col-span-2' : ''}
+      `}
     >
-      {/* Image */}
-      <div className="relative aspect-video overflow-hidden">
-        <img
-          src={project.image}
-          alt={project.title}
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/30 to-transparent" />
+      {/* gradient overlay on hover */}
+      <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br ${meta.color} pointer-events-none`} />
 
-        {isChromeExtension && (
-          <span className="absolute top-3 left-3 rounded-full bg-primary/90 px-3 py-1 text-[11px] font-semibold text-primary-foreground">
-            Chrome Extension
-          </span>
-        )}
-      </div>
+      <div className={`relative flex ${isFeatured ? 'flex-col md:flex-row' : 'flex-col'} h-full`}>
+        {/* Image */}
+        <div className={`relative overflow-hidden ${isFeatured ? 'md:w-[45%] aspect-video md:aspect-auto' : 'aspect-video'}`}>
+          <img
+            src={project.image}
+            alt={project.title}
+            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-card via-card/30 to-transparent md:bg-gradient-to-r" />
 
-      {/* Content */}
-      <div className="p-5">
-        {/* Title */}
-        <h3
-          className="
-            text-xl
-            font-bold
-            tracking-tight
-            text-foreground
-            group-hover:text-primary
-            transition-colors
-          "
-        >
-          {project.title}
-        </h3>
-
-        {/* Description */}
-        <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
-          {project.description}
-        </p>
-
-        {/* Tech preview chips */}
-        <div className="mt-4 flex flex-wrap gap-2">
-          {project.techStack.slice(0, 3).map((tech) => (
-            <span
-              key={tech}
-              className="
-                rounded-full border border-border/40 bg-secondary/40
-                px-3 py-1 text-[11px] font-medium
-                text-foreground/80 backdrop-blur
-                transition-colors
-                group-hover:border-primary/40 group-hover:text-primary
-              "
-            >
-              {tech}
-            </span>
-          ))}
-          {project.techStack.length > 3 && (
-            <span
-              className="
-                rounded-full border border-border/40 bg-secondary/40
-                px-3 py-1 text-[11px] font-medium text-muted-foreground
-              "
-            >
-              +{project.techStack.length - 3}
-            </span>
-          )}
+          {/* Number badge */}
+          <div className="absolute top-4 left-4 w-8 h-8 rounded-full bg-background/80 backdrop-blur border border-border/60 flex items-center justify-center text-xs font-bold text-muted-foreground">
+            0{index + 1}
+          </div>
         </div>
 
-        {/* CTA */}
-        <div className="mt-4 flex items-center gap-2 text-sm font-semibold text-primary">
-          View Details
-          <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+        {/* Content */}
+        <div className={`relative flex flex-col justify-between p-6 ${isFeatured ? 'md:p-8 flex-1' : ''}`}>
+          {/* Top */}
+          <div>
+            {/* Category tag */}
+            <span className={`inline-flex items-center gap-1.5 text-[11px] font-semibold tracking-wider uppercase px-2.5 py-1 rounded-full border ${tag} mb-4`}>
+              <meta.Icon className="w-3 h-3" />
+              {meta.label}
+            </span>
+
+            {/* Title */}
+            <h3 className={`font-bold tracking-tight text-foreground transition-colors duration-300 ${hoverAccent} ${isFeatured ? 'text-2xl md:text-3xl mb-3' : 'text-xl mb-2'}`}>
+              {project.title}
+            </h3>
+
+            {/* Description */}
+            <p className={`text-muted-foreground leading-relaxed ${isFeatured ? 'text-base line-clamp-3' : 'text-sm line-clamp-2'}`}>
+              {project.description}
+            </p>
+
+            {/* Tech chips */}
+            <div className="mt-4 flex flex-wrap gap-2">
+              {project.techStack.slice(0, isFeatured ? 5 : 3).map((tech) => (
+                <span
+                  key={tech}
+                  className={`rounded-full border border-border/40 bg-secondary/30 px-3 py-1 text-[11px] font-medium text-foreground/70 backdrop-blur transition-all duration-300 ${chipAccent}`}
+                >
+                  {tech}
+                </span>
+              ))}
+              {project.techStack.length > (isFeatured ? 5 : 3) && (
+                <span className="rounded-full border border-border/40 bg-secondary/30 px-3 py-1 text-[11px] font-medium text-muted-foreground">
+                  +{project.techStack.length - (isFeatured ? 5 : 3)} more
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Bottom row */}
+          <div className="mt-6 flex items-center justify-between">
+            {/* Links */}
+            <div className="flex items-center gap-3">
+              {project.liveDemo && project.liveDemo !== '#' && (
+                <a
+                  href={project.liveDemo}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="flex items-center gap-1.5 text-xs font-semibold text-foreground/80 hover:text-primary transition-colors"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  Live Demo
+                </a>
+              )}
+              {project.sourceCode && (
+                <a
+                  href={project.sourceCode}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="flex items-center gap-1.5 text-xs font-semibold text-foreground/80 hover:text-primary transition-colors"
+                >
+                  <Github className="w-3.5 h-3.5" />
+                  Source
+                </a>
+              )}
+            </div>
+
+            {/* CTA */}
+            <div className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground group-hover:text-foreground transition-colors duration-300">
+              View case study
+              <ArrowUpRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            </div>
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-/* ================= PROJECT MODAL ================= */
-
-const ProjectModal = ({
-  project,
-  onClose,
-}: {
-  project: Project;
-  onClose: () => void;
-}) => {
-  const modalRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
+/* ─── modal ─── */
+const ProjectModal = ({ project, onClose }: { project: Project; onClose: () => void }) => {
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const panelRef   = useRef<HTMLDivElement>(null);
+  const accent = modalAccent[project.id] ?? { badge: 'bg-primary/15 text-primary', border: 'border-primary/30', heading: 'text-primary', glow: 'shadow-primary/20' };
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
-
-    gsap.fromTo(modalRef.current, { opacity: 0 }, { opacity: 1, duration: 0.25 });
-    gsap.fromTo(
-      contentRef.current,
-      { opacity: 0, y: 30, scale: 0.97 },
-      { opacity: 1, y: 0, scale: 1, duration: 0.35, ease: 'power3.out' }
-    );
-
-    gsap.fromTo(
-      '.modal-section',
-      { opacity: 0, y: 20 },
-      { opacity: 1, y: 0, stagger: 0.1, delay: 0.2 }
-    );
-
-    return () => {
-      document.body.style.overflow = '';
-    };
+    gsap.fromTo(overlayRef.current, { opacity: 0 }, { opacity: 1, duration: 0.2 });
+    gsap.fromTo(panelRef.current,   { opacity: 0, y: 40, scale: 0.96 }, { opacity: 1, y: 0, scale: 1, duration: 0.35, ease: 'power3.out' });
+    gsap.fromTo('.ms', { opacity: 0, y: 16 }, { opacity: 1, y: 0, stagger: 0.07, delay: 0.25, duration: 0.4 });
+    return () => { document.body.style.overflow = ''; };
   }, []);
+
+  const close = () => {
+    gsap.to(panelRef.current,   { opacity: 0, y: 20, scale: 0.97, duration: 0.2 });
+    gsap.to(overlayRef.current, { opacity: 0, duration: 0.2, onComplete: onClose });
+  };
 
   return (
     <div
-      ref={modalRef}
-      onClick={onClose}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-background/90 backdrop-blur-md px-4"
+      ref={overlayRef}
+      onClick={close}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-background/85 backdrop-blur-lg px-4"
     >
       <div
-        ref={contentRef}
+        ref={panelRef}
         onClick={(e) => e.stopPropagation()}
-        className="glass-card max-w-5xl w-full max-h-[92vh] overflow-y-auto"
+        className={`relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl border ${accent.border} bg-card/95 backdrop-blur-xl shadow-2xl ${accent.glow}`}
       >
-        {/* Header */}
-        <div className="sticky top-0 z-10 border-b border-border/40 bg-card/90 backdrop-blur p-6 flex justify-between items-start">
-          <h2 className="text-2xl md:text-3xl font-bold text-foreground">
-            {project.title}
-          </h2>
+        {/* Close */}
+        <button
+          onClick={close}
+          className="absolute top-5 right-5 z-20 p-2 rounded-xl bg-secondary/60 hover:bg-secondary transition-colors"
+        >
+          <X className="w-4 h-4" />
+        </button>
 
-          <div className="flex gap-3">
-            {project.liveDemo && (
-              <a
-                href={project.liveDemo}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="
-                  flex items-center gap-2 px-5 py-2 rounded-lg
-                  bg-primary text-primary-foreground text-sm font-semibold
-                  transition-all duration-300
-                  hover:scale-105 hover:shadow-lg hover:shadow-primary/40
-                "
-              >
-                <ExternalLink className="w-4 h-4" />
-                Live
-              </a>
-            )}
-
-            {project.sourceCode && (
-              <a
-                href={project.sourceCode}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="
-                  flex items-center gap-2 px-5 py-2 rounded-lg
-                  bg-secondary text-sm font-semibold
-                  transition-all duration-300
-                  hover:scale-105 hover:shadow-lg
-                "
-              >
-                <Github className="w-4 h-4" />
-                Code
-              </a>
-            )}
-
-            <button
-              onClick={onClose}
-              className="p-2 rounded-md hover:bg-secondary transition"
-            >
-              <X className="w-5 h-5" />
-            </button>
+        {/* Hero image */}
+        <div className="relative h-52 md:h-64 overflow-hidden rounded-t-2xl">
+          <img src={project.image} alt={project.title} className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-card via-card/60 to-transparent" />
+          <div className="absolute bottom-6 left-8">
+            <span className={`inline-block text-[11px] font-bold tracking-widest uppercase px-3 py-1 rounded-full border ${accent.badge} ${accent.border} mb-2`}>
+              {categoryMeta[project.id]?.label ?? 'Project'}
+            </span>
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground">{project.title}</h2>
           </div>
         </div>
 
+        {/* Action buttons */}
+        <div className="flex gap-3 px-8 py-4 border-b border-border/30">
+          {project.liveDemo && project.liveDemo !== '#' && (
+            <a
+              href={project.liveDemo}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-semibold border ${accent.badge} ${accent.border} hover:brightness-110 transition-all`}
+            >
+              <ExternalLink className="w-4 h-4" />
+              Live Demo
+            </a>
+          )}
+          {project.sourceCode && (
+            <a
+              href={project.sourceCode}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-5 py-2 rounded-xl bg-secondary/60 text-sm font-semibold hover:bg-secondary transition-all"
+            >
+              <Github className="w-4 h-4" />
+              View Source
+            </a>
+          )}
+        </div>
+
         {/* Body */}
-        <div className="p-6 md:p-8 space-y-12">
-          {/* About */}
-          <p className="modal-section text-muted-foreground text-base leading-relaxed">
-            {project.description}
-          </p>
+        <div className="p-8 space-y-10">
+
+          {/* Description */}
+          <p className="ms text-muted-foreground text-base leading-relaxed">{project.description}</p>
 
           {/* Problem / Solution */}
-          <div className="modal-section grid md:grid-cols-2 gap-6">
-            <div className="rounded-lg bg-secondary/30 p-5">
-              <h4 className="font-bold mb-2">Problem</h4>
-              <p className="text-sm text-muted-foreground">{project.problem}</p>
+          <div className="ms grid md:grid-cols-2 gap-4">
+            <div className="rounded-xl bg-secondary/20 border border-border/30 p-5">
+              <p className="text-xs font-bold tracking-widest uppercase text-muted-foreground mb-2">Problem</p>
+              <p className="text-sm text-foreground/80 leading-relaxed">{project.problem}</p>
             </div>
-            <div className="rounded-lg bg-primary/5 p-5">
-              <h4 className="font-bold mb-2">Solution</h4>
-              <p className="text-sm text-muted-foreground">{project.solution}</p>
+            <div className={`rounded-xl border p-5 ${accent.badge} ${accent.border}`}>
+              <p className="text-xs font-bold tracking-widest uppercase mb-2 opacity-70">Solution</p>
+              <p className="text-sm leading-relaxed opacity-90">{project.solution}</p>
             </div>
           </div>
 
           {/* Features */}
-          <div className="modal-section">
-            <h4 className="font-bold mb-4">Key Features</h4>
-            <ul className="grid sm:grid-cols-2 gap-3 text-sm">
+          <div className="ms">
+            <p className="text-xs font-bold tracking-widest uppercase text-muted-foreground mb-4">Key Features</p>
+            <ul className="grid sm:grid-cols-2 gap-3">
               {project.features.map((f, i) => (
-                <li key={i} className="rounded-lg bg-secondary/20 p-4">
-                  {['✨', '⚡', '🔒', '🧠', '📊'][i % 5]} {f}
+                <li key={i} className="flex items-start gap-3 rounded-xl bg-secondary/20 border border-border/20 p-4 text-sm text-foreground/80">
+                  <span className={`mt-0.5 text-base ${accent.heading}`}>{featureIcons[i % featureIcons.length]}</span>
+                  {f}
                 </li>
               ))}
             </ul>
           </div>
 
           {/* Tech Stack */}
-          <div className="modal-section">
-            <h4 className="font-bold mb-4">Tech Stack</h4>
-            <div className="flex flex-wrap gap-3">
+          <div className="ms">
+            <p className="text-xs font-bold tracking-widest uppercase text-muted-foreground mb-4">Tech Stack</p>
+            <div className="flex flex-wrap gap-2">
               {project.techStack.map((tech) => (
                 <span
                   key={tech}
-                  className="
-                    px-4 py-2 rounded-xl text-sm font-semibold
-                    bg-secondary/40 border border-border/40
-                    transition-all duration-300
-                    hover:border-primary hover:text-primary
-                  "
+                  className={`px-4 py-1.5 rounded-xl text-sm font-semibold border transition-all duration-200 hover:brightness-110 ${accent.badge} ${accent.border}`}
                 >
                   {tech}
                 </span>
@@ -247,26 +294,21 @@ const ProjectModal = ({
           </div>
 
           {/* Challenges */}
-          <div className="modal-section">
-            <h4 className="font-bold mb-4">Challenges & Learnings</h4>
+          <div className="ms">
+            <p className="text-xs font-bold tracking-widest uppercase text-muted-foreground mb-4">Challenges & Learnings</p>
             <div className="space-y-3">
               {project.challenges.map((c, i) => (
-                <p
-                  key={i}
-                  className="border-l-2 border-primary/60 pl-4 text-sm text-muted-foreground"
-                >
-                  🧩 {c}
-                </p>
+                <div key={i} className={`flex gap-3 border-l-2 pl-4 ${accent.border}`}>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{c}</p>
+                </div>
               ))}
             </div>
           </div>
 
           {/* Impact */}
-          <div className="modal-section rounded-lg bg-primary/5 p-6">
-            <h4 className="font-bold mb-2">Impact</h4>
-            <p className="text-sm text-foreground/90">
-              🎯 {project.impressive}
-            </p>
+          <div className={`ms rounded-xl border p-6 ${accent.badge} ${accent.border}`}>
+            <p className="text-xs font-bold tracking-widest uppercase mb-3 opacity-70">Impact</p>
+            <p className={`text-sm font-semibold leading-relaxed ${accent.heading}`}>{project.impressive}</p>
           </div>
         </div>
       </div>
@@ -274,48 +316,62 @@ const ProjectModal = ({
   );
 };
 
-/* ================= PROJECTS SECTION ================= */
-
+/* ─── section ─── */
 const Projects = () => {
   const sectionRef = useRef<HTMLElement>(null);
-  const titleRef = useRef<HTMLHeadingElement>(null);
+  const titleRef   = useRef<HTMLHeadingElement>(null);
   const [active, setActive] = useState<Project | null>(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.fromTo(
-        titleRef.current,
-        { opacity: 0, y: 25 },
-        { opacity: 1, y: 0, duration: 0.45 }
-      );
-      gsap.fromTo(
-        '.project-card',
-        { opacity: 0, y: 25 },
-        { opacity: 1, y: 0, stagger: 0.12 }
-      );
+      gsap.fromTo(titleRef.current, { opacity: 0, y: 30 }, {
+        opacity: 1, y: 0, duration: 0.6,
+        scrollTrigger: { trigger: titleRef.current, start: 'top 85%' },
+      });
+      gsap.fromTo('.project-card', { opacity: 0, y: 40 }, {
+        opacity: 1, y: 0, stagger: 0.15, duration: 0.6, ease: 'power2.out',
+        scrollTrigger: { trigger: '.projects-grid', start: 'top 80%' },
+      });
     }, sectionRef);
-
     return () => ctx.revert();
   }, []);
 
   return (
-    <section ref={sectionRef} id="projects" className="pt-14 pb-20">
-      <div className="px-6 md:px-12 lg:px-20">
-        <h2
-          ref={titleRef}
-          className="text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-3 opacity-0"
-        >
-          Featured <span className="text-gradient">Projects</span>
-        </h2>
+    <section ref={sectionRef} id="projects" className="pt-16 pb-24">
+      <div className="px-6 md:px-12 lg:px-20 max-w-6xl mx-auto">
 
-        <p className="text-center text-muted-foreground max-w-2xl mx-auto mb-12">
-          Real-world projects showcasing full-stack, AI, and browser extension development
-        </p>
+        {/* Header */}
+        <div ref={titleRef} className="text-center mb-16 opacity-0">
+          <span className="inline-block text-xs font-bold tracking-widest uppercase text-primary/70 border border-primary/20 bg-primary/5 px-4 py-1.5 rounded-full mb-4">
+            Portfolio
+          </span>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
+            Featured <span className="text-gradient">Projects</span>
+          </h2>
+          <p className="text-muted-foreground max-w-xl mx-auto text-base">
+            A selection of real-world products — from AI-powered platforms to browser extensions — built and shipped end-to-end.
+          </p>
+        </div>
 
-        <div className="projects-grid grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
-          {projects.map((p) => (
-            <ProjectCard key={p.id} project={p} onClick={() => setActive(p)} />
+        {/* Grid: first card spans 2 cols, rest are normal */}
+        <div className="projects-grid grid md:grid-cols-2 gap-5">
+          {projects.map((p, i) => (
+            <ProjectCard key={p.id} project={p} index={i} onClick={() => setActive(p)} />
           ))}
+        </div>
+
+        {/* Footer CTA */}
+        <div className="mt-12 text-center">
+          <a
+            href="https://github.com/dhruvbajaj13"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors group"
+          >
+            <Github className="w-4 h-4" />
+            See all projects on GitHub
+            <ArrowUpRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+          </a>
         </div>
       </div>
 
