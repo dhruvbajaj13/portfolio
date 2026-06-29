@@ -50,8 +50,8 @@ const platforms = [
     iconSize: 'w-12 h-12',
     link: 'https://leetcode.com/u/Dhruv-Bajaj13/',
     stats: [
-      { label: 'Problems Solved', value: 850, suffix: '+' },
-      { label: 'Contests', value: 40, suffix: '+' },
+      { label: 'Problems Solved', value: 1000, suffix: '+' },
+      { label: 'Contests', value: 42, suffix: '+' },
       { label: 'Rating', value: 1926 },
       { label: 'Global Rank', value: 31744, suffix: '+' },
     ],
@@ -76,9 +76,9 @@ const platforms = [
     iconSize: 'w-16 h-16',
     link: 'https://www.codechef.com/users/dhruvvv_1307',
     stats: [
-      { label: 'Rating', value: 1556 },
-      { label: 'Stars', value: 2 },
-      { label: 'Contests', value: 13, suffix: '+' },
+      { label: 'Rating', value: 1605 },
+      { label: 'Stars', value: 3⭐️ },
+      { label: 'Contests', value: 17, suffix: '+' },
       { label: 'Problems Solved', value: 70, suffix: '+' },
     ],
     topics: ['Binary Search', 'Number Theory', 'Recursion'],
